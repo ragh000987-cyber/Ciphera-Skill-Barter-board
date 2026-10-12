@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skill Barter Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+<div>
+<h1>Skill Barter Board</h1>
+<p class="sub">Teach one hour, earn one credit. Spend it learning from anyone on campus.</p>
+</div>
+<div class="token" aria-live="polite"><b id="bal">2</b><span>time<br>credits</span></div>
+</header>
+
+<section>
+<h2>Your profile</h2>
+<div class="card">
+<div class="profile">
+<div><label for="off">Skills I can teach (comma separated)</label><input id="off"></div>
+<div><label for="want">Skills I want to learn</label><input id="want"></div>
+</div>
+<button id="save" class="alt">Save profile and find matches</button>
+</div>
+</section>
+
+<section>
+<h2>Matches for you</h2>
+<div id="matches" class="grid"></div>
+</section>
+
+<section>
+<h2>Your sessions</h2>
+<div class="card" id="sessions"></div>
+</section>
+
+<section>
+<h2>What campus wants and offers</h2>
+<div class="card"><div class="legend">Gold: students wanting it. Teal: students offering it.</div><div id="demand"></div></div>
+</section>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="script.js"></script>
+</body>
+</html>
