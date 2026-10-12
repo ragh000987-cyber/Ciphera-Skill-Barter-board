@@ -5,16 +5,20 @@ import morgan from "morgan";
 import session from "express-session";
 
 import { env } from "./config/env";
+
 import {
   errorHandler,
   notFoundHandler,
 } from "./middleware/error-handler";
+
 import { generalRateLimit } from "./middleware/rate-limit";
+
 import authRoutes from "./modules/auth/auth.routes";
+import userRoutes from "./modules/users/users.routes";
 
 const app = express();
 
-// Trust the reverse proxy in production deployments.
+// Trust the reverse proxy in production.
 if (env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
 }
@@ -22,17 +26,24 @@ if (env.NODE_ENV === "production") {
 // Security headers.
 app.use(helmet());
 
-// Allow requests from the frontend.
+// Frontend connection.
 app.use(
   cors({
     origin: env.WEB_URL,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// Parse incoming request bodies.
+// Request body parsing.
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
@@ -41,13 +52,11 @@ if (env.NODE_ENV !== "test") {
   app.use(morgan("dev"));
 }
 
-// Apply general API rate limiting.
+// Rate limiting.
 app.use("/api", generalRateLimit);
 
 // Session configuration.
-//
-// The default MemoryStore is suitable only for initial development.
-// Replace it with a persistent session store before production.
+// Replace MemoryStore with a persistent session store before production.
 app.use(
   session({
     name: env.SESSION_COOKIE_NAME,
@@ -58,12 +67,17 @@ app.use(
       httpOnly: true,
       secure: env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: env.SESSION_MAX_AGE_DAYS * 24 * 60 * 60 * 1000,
+      maxAge:
+        env.SESSION_MAX_AGE_DAYS *
+        24 *
+        60 *
+        60 *
+        1000,
     },
   })
 );
 
-// Health-check endpoint.
+// Health check.
 app.get("/health", (_req, res) => {
   res.status(200).json({
     success: true,
@@ -73,13 +87,14 @@ app.get("/health", (_req, res) => {
   });
 });
 
-// API version 1.
+// API version 1 routes.
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
 
-// Return a 404 response for unknown routes.
+// Handle unknown routes.
 app.use(notFoundHandler);
 
-// Handle application errors.
+// Central error handler.
 app.use(errorHandler);
 
 export default app;
